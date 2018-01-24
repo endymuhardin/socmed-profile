@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -52,8 +51,8 @@ public class GoogleAuthorizationController {
         return "redirect:"+url;
     }
 
-    @GetMapping("/auth/callback") @ResponseBody
-    public TokenResponse handleCallbackFromGoogle(@RequestParam String state, @RequestParam String code, HttpServletRequest request)  {
+    @GetMapping("/auth/callback")
+    public String handleCallbackFromGoogle(@RequestParam String state, @RequestParam String code, HttpServletRequest request)  {
         try {
             TokenResponse tokenResponse = flow.newTokenRequest(code)
                     .setRedirectUri(redirectUrl(request))
@@ -69,7 +68,7 @@ public class GoogleAuthorizationController {
                     .atZone(ZoneId.systemDefault())
                     .toInstant()));
             websiteDao.save(web);
-            return tokenResponse;
+            return "redirect:/website/analytics";
         } catch (IOException e) {
             e.printStackTrace();
         }

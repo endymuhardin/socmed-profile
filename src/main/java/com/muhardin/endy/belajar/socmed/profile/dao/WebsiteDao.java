@@ -4,4 +4,5 @@ import com.muhardin.endy.belajar.socmed.profile.entity.Website;
 import org.springframework.data.repository.CrudRepository;
 
 public interface WebsiteDao extends CrudRepository<Website, String> {
+    Website findByUrl(String url);
 }

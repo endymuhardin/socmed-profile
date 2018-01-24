@@ -8,7 +8,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Entity @Data
+@Entity @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"url"})})
+@Data
 public class Website {
     @Id
     @GeneratedValue(generator = "uuid")

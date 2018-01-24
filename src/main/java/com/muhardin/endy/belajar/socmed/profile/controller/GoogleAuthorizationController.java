@@ -59,8 +59,7 @@ public class GoogleAuthorizationController {
                     .execute();
             Website web = new Website();
             web.setUrl("https://software.endy.muhardin.com");
-            web.setGoogleAnalyticsAccountId("UA-36102948-1");
-            web.setGoogleAnalyticsViewId("65778193");
+            web.setGoogleAnalyticsTrackingId("UA-36102948-1");
             web.setAccessToken(tokenResponse.getAccessToken());
             web.setRefreshToken(tokenResponse.getRefreshToken());
             web.setTokenExpireDate(Date.from(LocalDateTime.now()

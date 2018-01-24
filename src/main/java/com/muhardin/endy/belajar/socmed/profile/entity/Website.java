@@ -19,8 +19,7 @@ public class Website {
     @NotNull @NotEmpty
     private String url;
 
-    private String googleAnalyticsAccountId;
-    private String googleAnalyticsViewId;
+    private String googleAnalyticsTrackingId;
     private String accessToken;
     private String refreshToken;
 

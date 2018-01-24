@@ -1,4 +1,4 @@
-package com.muhardin.endy.belajar.socmed.socmedprofile;
+package com.muhardin.endy.belajar.socmed.profile;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

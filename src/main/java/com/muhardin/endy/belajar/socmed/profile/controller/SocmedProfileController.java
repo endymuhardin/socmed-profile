@@ -19,6 +19,11 @@ public class SocmedProfileController {
     @Autowired private GoogleAnalytics googleAnalytics;
     @Autowired private WebsiteDao websiteDao;
 
+    @GetMapping("/")
+    public String indexPage() {
+        return "redirect:/website/form";
+    }
+
     @GetMapping("/website/form")
     public void displayWebsiteForm() { }
 

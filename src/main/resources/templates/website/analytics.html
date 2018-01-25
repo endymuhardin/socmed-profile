@@ -1,26 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Website Analytics</title>
 </head>
 <body>
     <h1>Website Analytics</h1>
+
+    <ul>
+        <li>Total Page Views : <span th:text="${gaReport.totalPageviews}">10000</span></li>
+        <li>Total Visitors : <span th:text="${gaReport.totalVisitors}">10000</span></li>
+    </ul>
+
+
     <table>
         <thead>
         <tr>
-            <th>Metric</th>
-            <th>Value</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Page Views</th>
+            <th>Visitors</th>
         </tr>
         </thead>
         <tbody>
-            <tr>
-               <td>Page Views</td>
-               <td>100000</td>
-            </tr>
-            <tr>
-                <td>Unique Visitor</td>
-                <td>100000</td>
+            <tr th:each="row : ${gaReport.rows}">
+               <td th:text="${row.city}">100000</td>
+               <td th:text="${row.country}">100000</td>
+               <td th:text="${row.pageviews}">100000</td>
+               <td th:text="${row.visitors}">100000</td>
             </tr>
         </tbody>
     </table>

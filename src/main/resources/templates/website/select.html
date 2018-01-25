@@ -2,20 +2,20 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Pilih Profil</title>
+    <title>Profil Google Analytics</title>
 </head>
 <body>
-    <h1>Pilih Profil</h1>
+    <h1>Profil Google Analytics</h1>
 
     <form method="post">
 
-        Pilih Profil Google Analytics :
+        Pilih profil :
         <select name="profile">
             <option th:each="p : ${daftarProfil}"
                     th:value="${p.id}"
                     th:text="${p.name}">Pilih Profil</option>
         </select>
-        <input type="submit" value="Simpan">
+        <input type="submit" value="Lanjutkan">
     </form>
 
 </body>

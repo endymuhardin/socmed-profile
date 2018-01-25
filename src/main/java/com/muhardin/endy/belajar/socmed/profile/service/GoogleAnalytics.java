@@ -7,6 +7,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.model.*;
+import com.muhardin.endy.belajar.socmed.profile.dto.GaReportRow;
 import com.muhardin.endy.belajar.socmed.profile.dto.GoogleAnalyticsReport;
 import com.muhardin.endy.belajar.socmed.profile.entity.Website;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GoogleAnalytics {
@@ -52,11 +54,17 @@ public class GoogleAnalytics {
 
     public GoogleAnalyticsReport generateReport(Website website) {
         try {
+            String metrics = "ga:visitors,ga:pageviews";
+            String dimensions = "ga:city,ga:country";
+            String sort = "ga:country,-ga:visitors,-ga:pageviews";
+
             Analytics analytics = getAnalytics(website);
-            printResults(analytics.data().ga()
-                    .get("ga:" + website.getProfileId(), "7daysAgo", "today", "ga:sessions")
-                    .execute());
-            return GoogleAnalyticsReport.builder().build();
+            GaData hasil = analytics.data().ga()
+                    .get("ga:" + website.getProfileId(), "30daysAgo", "today", metrics)
+                    .setDimensions(dimensions)
+                    .setSort(sort)
+                    .execute();
+            return printResults(hasil);
         } catch (Exception err) {
             err.printStackTrace();
             return GoogleAnalyticsReport.builder().build();
@@ -73,16 +81,48 @@ public class GoogleAnalytics {
                 .build();
     }
 
-    private static void printResults(GaData results) {
-        // Parse the response from the Core Reporting API for
-        // the profile name and number of sessions.
-        if (results != null && !results.getRows().isEmpty()) {
-            System.out.println("View (Profile) Name: "
-                    + results.getProfileInfo().getProfileName());
-            System.out.println("Total Sessions: " + results.getRows().get(0).get(0));
-        } else {
-            System.out.println("No results found");
+    private static GoogleAnalyticsReport printResults(GaData results) {
+        Map<String, String> totalsMap = results.getTotalsForAllResults();
+
+        for (Map.Entry entry : totalsMap.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
         }
+
+        System.out.println("Column Headers:");
+
+        for (GaData.ColumnHeaders header : results.getColumnHeaders()) {
+            System.out.println("Column Name: " + header.getName());
+            System.out.println("Column Type: " + header.getColumnType());
+            System.out.println("Column Data Type: " + header.getDataType());
+        }
+
+        List<GaReportRow> rows = new ArrayList<>();
+
+        // Print the rows of data.
+        for (List<String> rowValues : results.getRows()) {
+            GaReportRow row = GaReportRow.builder()
+                    .city(rowValues.get(0))
+                    .country(rowValues.get(1))
+                    .visitors(Integer.valueOf(rowValues.get(2)))
+                    .pageviews(Integer.valueOf(rowValues.get(3)))
+                    .build();
+            rows.add(row);
+
+            for (String value : rowValues) {
+                System.out.format("%-32s", value);
+            }
+            System.out.println();
+        }
+
+        Integer totalPageview = Integer.valueOf(totalsMap.get("ga:pageviews"));
+        Integer totalVisitor = Integer.valueOf(totalsMap.get("ga:visitors"));
+
+        return GoogleAnalyticsReport.builder()
+                .rows(rows)
+                .totalPageviews(totalPageview)
+                .totalVisitors(totalVisitor)
+                .build();
+
     }
 
 }

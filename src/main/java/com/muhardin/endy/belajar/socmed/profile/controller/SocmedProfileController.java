@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class SocmedProfileController {
+
+    // harusnya ini diambil dari user yang sedang login
     private static final String user = "endy";
 
     @Autowired private GoogleAnalytics googleAnalytics;

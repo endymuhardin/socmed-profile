@@ -9,10 +9,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class SocmedProfileController {
+    private static final String user = "endy";
+
     @Autowired private GoogleAnalytics googleAnalytics;
     @Autowired private WebsiteDao websiteDao;
 
@@ -20,22 +21,40 @@ public class SocmedProfileController {
     public void displayWebsiteForm() { }
 
     @PostMapping("/website/form")
-    public String processWebsiteForm(@RequestParam String url,
-                                     RedirectAttributes redirectAttrs) {
+    public String processWebsiteForm() {
+        Website website = websiteDao.findByUser(user);
+        if (website == null) {
+            website = new Website();
+            website.setUser(user);
+            websiteDao.save(website);
+            return "redirect:/google/auth/start";
+        }
+
+        if (website.getAccessToken() == null) {
+            return "redirect:/google/auth/start";
+        }
+
+        return "redirect:analytics";
+    }
+
+    @GetMapping("/website/select")
+    public void displayFormSelectView(Model model) {
+        Website website = websiteDao.findByUser(user);
+        model.addAttribute("daftarProfil", googleAnalytics.getProfiles(website));
+    }
+
+    @PostMapping("/website/select")
+    public String processFormSelectView(@RequestParam String profile) {
+        Website website = websiteDao.findByUser(user);
+        website.setProfileId(profile);
+        websiteDao.save(website);
         return "redirect:analytics";
     }
 
     @GetMapping("/website/analytics")
-    public String displayWebsiteAnalytics(Model model) {
-        Website website = websiteDao.findByUrl("https://software.endy.muhardin.com");
-
-        if (website == null || website.getAccessToken() == null) {
-            return "redirect:/google/auth/start";
-        }
-
-        model.addAttribute("data", googleAnalytics.generateReport(website));
-
-        return "/website/analytics";
+    public void displayWebsiteAnalytics(Model model) {
+        Website website = websiteDao.findByUser(user);
+        model.addAttribute("gaReport", googleAnalytics.generateReport(website));
     }
 
 }

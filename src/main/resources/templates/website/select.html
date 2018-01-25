@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pilih Profil</title>
+</head>
+<body>
+    <h1>Pilih Profil</h1>
+
+    <form method="post">
+
+        Pilih Profil Google Analytics :
+        <select name="profile">
+            <option th:each="p : ${daftarProfil}"
+                    th:value="${p.id}"
+                    th:text="${p.name}">Pilih Profil</option>
+        </select>
+        <input type="submit" value="Simpan">
+    </form>
+
+</body>
+</html>

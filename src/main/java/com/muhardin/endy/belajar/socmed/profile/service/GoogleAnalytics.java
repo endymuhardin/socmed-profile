@@ -12,56 +12,65 @@ import com.muhardin.endy.belajar.socmed.profile.entity.Website;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class GoogleAnalytics {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     @Value("${spring.application.name}") private String appname;
 
-    public GoogleAnalyticsReport generateReport(Website website) {
+    public List<Profile> getProfiles(Website website) {
+        List<Profile> hasil = new ArrayList<>();
+
         try {
-            GoogleCredential credential = new GoogleCredential()
-                    .setAccessToken(website.getAccessToken());
-
-            HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            Analytics analytics = new Analytics.Builder(httpTransport, JSON_FACTORY, credential)
-                    .setApplicationName(appname)
-                    .build();
-            System.out.println("Mengakses Google API");
-
-            Accounts accounts = analytics.management().accounts().list().execute();
-
-            System.out.println("Daftar Akun : ");
-            for (Account acc : accounts.getItems()) {
-                System.out.println("==============================");
-                System.out.println("ID : "+acc.getId());
-                System.out.println("Name : "+acc.getName());
-
-                Webproperties properties = analytics.management().webproperties()
-                        .list(acc.getId()).execute();
-
-                for (Webproperty prop : properties.getItems()) {
+            Analytics analytics = getAnalytics(website);
+            for (Account acc : analytics.management().accounts().list().execute().getItems()) {
+                for (Webproperty prop : analytics.management().webproperties()
+                        .list(acc.getId()).execute().getItems()) {
                     Profiles profiles = analytics.management().profiles().list(acc.getId(), prop.getId()).execute();
-                    for (Profile profile : profiles.getItems()) {
-                        System.out.println("Profile Info");
-                        System.out.println("Account ID: " + profile.getAccountId());
-                        System.out.println("Web Property ID: " + profile.getWebPropertyId());
-                        System.out.println("Internal Web Property ID: " + profile.getInternalWebPropertyId());
-                        System.out.println("Profile ID: " + profile.getId());
-                        System.out.println("Profile Name: " + profile.getName());
-
-                        printResults(analytics.data().ga()
-                                .get("ga:" + profile.getId(), "7daysAgo", "today", "ga:sessions")
-                                .execute());
+                    System.out.println("Jumlah Profile : "+profiles.getTotalResults());
+                    for (Profile p : profiles.getItems()) {
+                        System.out.println("Profile ID : "+p.getId());
+                        System.out.println("Profile Name : "+p.getName());
+                        System.out.println("Profile Account ID : "+p.getAccountId());
+                        System.out.println("Profile Web Property ID : "+p.getWebPropertyId());
+                        System.out.println("Profile Internal Web Property ID : "+p.getInternalWebPropertyId());
+                        hasil.add(p);
                     }
                 }
             }
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
 
+        return hasil;
+    }
+
+    public GoogleAnalyticsReport generateReport(Website website) {
+        try {
+            Analytics analytics = getAnalytics(website);
+            printResults(analytics.data().ga()
+                    .get("ga:" + website.getProfileId(), "7daysAgo", "today", "ga:sessions")
+                    .execute());
             return GoogleAnalyticsReport.builder().build();
         } catch (Exception err) {
             err.printStackTrace();
             return GoogleAnalyticsReport.builder().build();
         }
+    }
+
+    private Analytics getAnalytics(Website website) throws GeneralSecurityException, IOException {
+        GoogleCredential credential = new GoogleCredential()
+                .setAccessToken(website.getAccessToken());
+
+        HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        return new Analytics.Builder(httpTransport, JSON_FACTORY, credential)
+                .setApplicationName(appname)
+                .build();
     }
 
     private static void printResults(GaData results) {

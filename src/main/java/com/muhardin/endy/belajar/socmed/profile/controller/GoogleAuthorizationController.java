@@ -44,8 +44,9 @@ public class GoogleAuthorizationController {
 
     @GetMapping("/auth/start")
     public String startAuthorizationFlow(HttpServletRequest request) {
+        String user = "endy";
         String url = flow.newAuthorizationUrl()
-                .setState("abc")
+                .setState(user)
                 .setRedirectUri(redirectUrl(request))
                 .build();
         return "redirect:"+url;
@@ -57,9 +58,8 @@ public class GoogleAuthorizationController {
             TokenResponse tokenResponse = flow.newTokenRequest(code)
                     .setRedirectUri(redirectUrl(request))
                     .execute();
-            Website web = new Website();
-            web.setUrl("https://software.endy.muhardin.com");
-            web.setGoogleAnalyticsTrackingId("UA-36102948-1");
+
+            Website web = websiteDao.findByUser(state);
             web.setAccessToken(tokenResponse.getAccessToken());
             web.setRefreshToken(tokenResponse.getRefreshToken());
             web.setTokenExpireDate(Date.from(LocalDateTime.now()
@@ -67,7 +67,7 @@ public class GoogleAuthorizationController {
                     .atZone(ZoneId.systemDefault())
                     .toInstant()));
             websiteDao.save(web);
-            return "redirect:/website/analytics";
+            return "redirect:/website/select";
         } catch (IOException e) {
             e.printStackTrace();
         }

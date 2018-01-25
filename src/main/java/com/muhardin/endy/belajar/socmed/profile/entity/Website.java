@@ -8,7 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Entity @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"url"})})
+@Entity @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user"})})
 @Data
 public class Website {
     @Id
@@ -17,9 +17,9 @@ public class Website {
     private String id;
 
     @NotNull @NotEmpty
+    private String user;
     private String url;
-
-    private String googleAnalyticsTrackingId;
+    private String profileId;
     private String accessToken;
     private String refreshToken;
 

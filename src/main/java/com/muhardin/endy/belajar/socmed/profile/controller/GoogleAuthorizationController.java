@@ -6,6 +6,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.muhardin.endy.belajar.socmed.profile.dao.WebsiteDao;
 import com.muhardin.endy.belajar.socmed.profile.entity.Website;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,8 @@ import java.util.Date;
 @Controller
 @RequestMapping("/google")
 public class GoogleAuthorizationController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleAuthorizationController.class);
 
     @Value("${google.oauth.client-id}") private String clientId;
     @Value("${google.oauth.client-secret}") private String clientSecret;
@@ -63,6 +67,8 @@ public class GoogleAuthorizationController {
             TokenResponse tokenResponse = flow.newTokenRequest(code)
                     .setRedirectUri(redirectUrl(request))
                     .execute();
+
+            LOGGER.info("Token Response : {}",tokenResponse);
 
             Website web = websiteDao.findByUser(state);
             web.setAccessToken(tokenResponse.getAccessToken());

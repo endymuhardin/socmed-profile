@@ -8,6 +8,14 @@
     <h1>Website Analytics</h1>
 
     <ul>
+        <li>Account ID : <span th:text="${gaReport.accountId}">10000</span></li>
+        <li>Profile ID : <span th:text="${gaReport.profileId}">10000</span></li>
+        <li>Profile Name : <span th:text="${gaReport.profileName}">10000</span></li>
+        <li>Tracking ID : <span th:text="${gaReport.trackingId}">10000</span></li>
+        <li>View ID : <span th:text="${gaReport.viewId}">10000</span></li>
+        <li>Table ID : <span th:text="${gaReport.tableId}">10000</span></li>
+        <li>Start Date : <span th:text="${gaReport.startDate}">10000</span></li>
+        <li>End Date : <span th:text="${gaReport.endDate}">10000</span></li>
         <li>Total Page Views : <span th:text="${gaReport.totalPageviews}">10000</span></li>
         <li>Total Visitors : <span th:text="${gaReport.totalVisitors}">10000</span></li>
     </ul>

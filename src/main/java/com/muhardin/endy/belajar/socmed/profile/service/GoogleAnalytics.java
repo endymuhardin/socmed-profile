@@ -141,6 +141,14 @@ public class GoogleAnalytics {
             Integer totalVisitor = Integer.valueOf(totalsMap.get("ga:visitors"));
 
             return GoogleAnalyticsReport.builder()
+                    .accountId(results.getProfileInfo().getAccountId())
+                    .profileId(results.getProfileInfo().getProfileId())
+                    .profileName(results.getProfileInfo().getProfileName())
+                    .tableId(results.getProfileInfo().getTableId())
+                    .viewId(results.getProfileInfo().getInternalWebPropertyId())
+                    .trackingId(results.getProfileInfo().getWebPropertyId())
+                    .startDate(results.getQuery().getStartDate())
+                    .endDate(results.getQuery().getEndDate())
                     .rows(rows)
                     .totalPageviews(totalPageview)
                     .totalVisitors(totalVisitor)

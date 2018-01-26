@@ -51,6 +51,8 @@ public class GoogleAuthorizationController {
         String url = flow.newAuthorizationUrl()
                 .setState(user)
                 .setRedirectUri(redirectUrl(request))
+                .setAccessType("offline")
+                .setApprovalPrompt("force")
                 .build();
         return "redirect:"+url;
     }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -43,8 +44,10 @@ public class GoogleAuthorizationController {
     }
 
     @GetMapping("/auth/start")
-    public String startAuthorizationFlow(HttpServletRequest request) {
-        String user = "endy";
+    public String startAuthorizationFlow(HttpServletRequest request, @SessionAttribute(required = false) String user) {
+        if (user == null) {
+            return "redirect:/website/form";
+        }
         String url = flow.newAuthorizationUrl()
                 .setState(user)
                 .setRedirectUri(redirectUrl(request))

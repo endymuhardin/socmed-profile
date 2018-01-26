@@ -7,6 +7,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.model.*;
+import com.muhardin.endy.belajar.socmed.profile.dto.GaProfile;
 import com.muhardin.endy.belajar.socmed.profile.dto.GaReportRow;
 import com.muhardin.endy.belajar.socmed.profile.dto.GoogleAnalyticsReport;
 import com.muhardin.endy.belajar.socmed.profile.entity.Website;
@@ -32,8 +33,8 @@ public class GoogleAnalytics {
     @Value("${google.oauth.client-secret}") private String clientSecret;
 
 
-    public List<Profile> getProfiles(Website website) {
-        List<Profile> hasil = new ArrayList<>();
+    public List<GaProfile> getProfiles(Website website) {
+        List<GaProfile> hasil = new ArrayList<>();
 
         try {
             Analytics analytics = getAnalytics(website);
@@ -43,12 +44,15 @@ public class GoogleAnalytics {
                     Profiles profiles = analytics.management().profiles().list(acc.getId(), prop.getId()).execute();
                     LOGGER.info("Jumlah Profile : "+profiles.getTotalResults());
                     for (Profile p : profiles.getItems()) {
+                        GaProfile gaProfile = new GaProfile();
+                        gaProfile.setAccount(acc);
+                        gaProfile.setProfile(p);
                         LOGGER.info("Profile ID : {}",p.getId());
                         LOGGER.info("Profile Name : {}",p.getName());
                         LOGGER.info("Profile Account ID : {}",p.getAccountId());
                         LOGGER.info("Profile Web Property ID : {}",p.getWebPropertyId());
                         LOGGER.info("Profile Internal Web Property ID : {}",p.getInternalWebPropertyId());
-                        hasil.add(p);
+                        hasil.add(gaProfile);
                     }
                 }
             }

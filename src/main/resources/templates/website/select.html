@@ -12,8 +12,8 @@
         Pilih profil :
         <select name="profile">
             <option th:each="p : ${daftarProfil}"
-                    th:value="${p.id}"
-                    th:text="${p.name}">Pilih Profil</option>
+                    th:value="${p.profile.id}"
+                    th:text="${p.account.name + ' - '+ p.profile.name}">Pilih Profil</option>
         </select>
         <input type="submit" value="Lanjutkan">
     </form>

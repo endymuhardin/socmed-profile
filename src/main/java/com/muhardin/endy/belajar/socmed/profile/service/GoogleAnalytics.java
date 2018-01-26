@@ -95,47 +95,60 @@ public class GoogleAnalytics {
     }
 
     private static GoogleAnalyticsReport printResults(GaData results) {
-        Map<String, String> totalsMap = results.getTotalsForAllResults();
+        try {
+            LOGGER.info(results.toPrettyString());
 
-        for (Map.Entry entry : totalsMap.entrySet()) {
-            LOGGER.info("{} : {}", entry.getKey(), entry.getValue());
-        }
+            Map<String, String> totalsMap = results.getTotalsForAllResults();
 
-        LOGGER.info("Column Headers:");
-
-        for (GaData.ColumnHeaders header : results.getColumnHeaders()) {
-            LOGGER.info("Column Name: {}", header.getName());
-            LOGGER.info("Column Type: {}", header.getColumnType());
-            LOGGER.info("Column Data Type: {}", header.getDataType());
-        }
-
-        List<GaReportRow> rows = new ArrayList<>();
-
-        // Print the rows of data.
-        for (List<String> rowValues : results.getRows()) {
-            GaReportRow row = GaReportRow.builder()
-                    .city(rowValues.get(0))
-                    .country(rowValues.get(1))
-                    .visitors(Integer.valueOf(rowValues.get(2)))
-                    .pageviews(Integer.valueOf(rowValues.get(3)))
-                    .build();
-            rows.add(row);
-            StringBuilder rowData = new StringBuilder();
-            for (String value : rowValues) {
-                rowData.append(String.format("%-32s", value));
+            for (Map.Entry entry : totalsMap.entrySet()) {
+                LOGGER.info("{} : {}", entry.getKey(), entry.getValue());
             }
-            LOGGER.info(rowData.toString());
+
+            LOGGER.info("Column Headers:");
+
+            StringBuilder tableHeader = new StringBuilder();
+            for (GaData.ColumnHeaders header : results.getColumnHeaders()) {
+                StringBuilder columnHeader = new StringBuilder();
+                columnHeader.append(header.getName());
+                columnHeader.append(" - ");
+                columnHeader.append(header.getColumnType());
+                columnHeader.append(" - ");
+                columnHeader.append(header.getDataType());
+                tableHeader.append(String.format("%-32s", columnHeader.toString()));
+            }
+
+            List<GaReportRow> rows = new ArrayList<>();
+
+            // Print Table Header
+            LOGGER.info(tableHeader.toString());
+            // Print the rows of data.
+            for (List<String> rowValues : results.getRows()) {
+                GaReportRow row = GaReportRow.builder()
+                        .city(rowValues.get(0))
+                        .country(rowValues.get(1))
+                        .visitors(Integer.valueOf(rowValues.get(2)))
+                        .pageviews(Integer.valueOf(rowValues.get(3)))
+                        .build();
+                rows.add(row);
+                StringBuilder rowData = new StringBuilder();
+                for (String value : rowValues) {
+                    rowData.append(String.format("%-32s", value));
+                }
+                LOGGER.info(rowData.toString());
+            }
+
+            Integer totalPageview = Integer.valueOf(totalsMap.get("ga:pageviews"));
+            Integer totalVisitor = Integer.valueOf(totalsMap.get("ga:visitors"));
+
+            return GoogleAnalyticsReport.builder()
+                    .rows(rows)
+                    .totalPageviews(totalPageview)
+                    .totalVisitors(totalVisitor)
+                    .build();
+        } catch (Exception err) {
+            LOGGER.error(err.getMessage(), err);
+            return GoogleAnalyticsReport.builder().build();
         }
-
-        Integer totalPageview = Integer.valueOf(totalsMap.get("ga:pageviews"));
-        Integer totalVisitor = Integer.valueOf(totalsMap.get("ga:visitors"));
-
-        return GoogleAnalyticsReport.builder()
-                .rows(rows)
-                .totalPageviews(totalPageview)
-                .totalVisitors(totalVisitor)
-                .build();
-
     }
 
 }

@@ -10,6 +10,8 @@ import com.google.api.services.analytics.model.*;
 import com.muhardin.endy.belajar.socmed.profile.dto.GaReportRow;
 import com.muhardin.endy.belajar.socmed.profile.dto.GoogleAnalyticsReport;
 import com.muhardin.endy.belajar.socmed.profile.entity.Website;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,9 @@ import java.util.Map;
 @Service
 public class GoogleAnalytics {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleAnalytics.class);
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    
     @Value("${spring.application.name}") private String appname;
     @Value("${google.oauth.client-id}") private String clientId;
     @Value("${google.oauth.client-secret}") private String clientSecret;
@@ -37,13 +41,13 @@ public class GoogleAnalytics {
                 for (Webproperty prop : analytics.management().webproperties()
                         .list(acc.getId()).execute().getItems()) {
                     Profiles profiles = analytics.management().profiles().list(acc.getId(), prop.getId()).execute();
-                    System.out.println("Jumlah Profile : "+profiles.getTotalResults());
+                    LOGGER.info("Jumlah Profile : "+profiles.getTotalResults());
                     for (Profile p : profiles.getItems()) {
-                        System.out.println("Profile ID : "+p.getId());
-                        System.out.println("Profile Name : "+p.getName());
-                        System.out.println("Profile Account ID : "+p.getAccountId());
-                        System.out.println("Profile Web Property ID : "+p.getWebPropertyId());
-                        System.out.println("Profile Internal Web Property ID : "+p.getInternalWebPropertyId());
+                        LOGGER.info("Profile ID : {}",p.getId());
+                        LOGGER.info("Profile Name : {}",p.getName());
+                        LOGGER.info("Profile Account ID : {}",p.getAccountId());
+                        LOGGER.info("Profile Web Property ID : {}",p.getWebPropertyId());
+                        LOGGER.info("Profile Internal Web Property ID : {}",p.getInternalWebPropertyId());
                         hasil.add(p);
                     }
                 }
@@ -94,15 +98,15 @@ public class GoogleAnalytics {
         Map<String, String> totalsMap = results.getTotalsForAllResults();
 
         for (Map.Entry entry : totalsMap.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
+            LOGGER.info("{} : {}", entry.getKey(), entry.getValue());
         }
 
-        System.out.println("Column Headers:");
+        LOGGER.info("Column Headers:");
 
         for (GaData.ColumnHeaders header : results.getColumnHeaders()) {
-            System.out.println("Column Name: " + header.getName());
-            System.out.println("Column Type: " + header.getColumnType());
-            System.out.println("Column Data Type: " + header.getDataType());
+            LOGGER.info("Column Name: {}", header.getName());
+            LOGGER.info("Column Type: {}", header.getColumnType());
+            LOGGER.info("Column Data Type: {}", header.getDataType());
         }
 
         List<GaReportRow> rows = new ArrayList<>();
@@ -116,11 +120,11 @@ public class GoogleAnalytics {
                     .pageviews(Integer.valueOf(rowValues.get(3)))
                     .build();
             rows.add(row);
-
+            StringBuilder rowData = new StringBuilder();
             for (String value : rowValues) {
-                System.out.format("%-32s", value);
+                rowData.append(String.format("%-32s", value));
             }
-            System.out.println();
+            LOGGER.info(rowData.toString());
         }
 
         Integer totalPageview = Integer.valueOf(totalsMap.get("ga:pageviews"));

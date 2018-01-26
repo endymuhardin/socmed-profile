@@ -24,6 +24,9 @@ public class GoogleAnalytics {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     @Value("${spring.application.name}") private String appname;
+    @Value("${google.oauth.client-id}") private String clientId;
+    @Value("${google.oauth.client-secret}") private String clientSecret;
+
 
     public List<Profile> getProfiles(Website website) {
         List<Profile> hasil = new ArrayList<>();
@@ -72,10 +75,16 @@ public class GoogleAnalytics {
     }
 
     private Analytics getAnalytics(Website website) throws GeneralSecurityException, IOException {
-        GoogleCredential credential = new GoogleCredential()
-                .setAccessToken(website.getAccessToken());
-
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+
+        GoogleCredential credential = new GoogleCredential.Builder()
+                .setTransport(httpTransport)
+                .setJsonFactory(JSON_FACTORY)
+                .setClientSecrets(clientId, clientSecret)
+                .build()
+                .setAccessToken(website.getAccessToken())
+                .setRefreshToken(website.getRefreshToken());
+
         return new Analytics.Builder(httpTransport, JSON_FACTORY, credential)
                 .setApplicationName(appname)
                 .build();
